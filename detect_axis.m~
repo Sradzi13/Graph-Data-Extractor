@@ -10,12 +10,68 @@ BWvert = edge(image,'sobel', threshold * fudgeFactor, 'vertical');
 figure, imshow(BWvert), title('binary gradient mask vert');
 
 
+
 %iterate along detected axis and make an array or where ticks are 
 %get rid of threshold
 
 %region labeling to get rid of minor ticks
 
-%
+% coordinates of the origin, endpts of x and y axis
+
+[h, w] = size(BWhorz);
+
+%find y axis
+startCol = 1;
+axisCol = 1;
+while axisCol == 1
+    currCol = BWvert(:, startCol);
+    condInds = find(currCol == 1);
+    numPixelsTrue = size(condInds, 1);
+    if numPixelsTrue > h/2
+        disp(numPixelsTrue)
+        axisCol = startCol;
+        break;
+    end 
+    startCol = startCol + 1;
+end
+
+%find x axis
+startRow = 1;
+axisRow = 1;
+while axisRow == 1
+    currRow = BWhorz(startRow, :);
+    condInds = find(currRow);
+    numPixelsTrue = size(condInds, 2);
+    if numPixelsTrue > w/2
+        disp(numPixelsTrue)
+        axisRow = startRow;
+        break;
+    end 
+    startRow = startRow + 1;
+end
+
+%yStart = condInds(1);
+%yEnd = condInds(end);
+
+%xStart = condInds(1);
+%xEnd = condInds(end);
+
+
+tic_margin = 10;
+axis_margin = 2;
+%find y axis tic mark locations
+if axisCol < w/2 
+    axisCrop = BWvert(:, axisCol - axis_margin:axisCol + tic_margin);
+    figure, imshow(axisCrop);
+end
+
+%find x axis tic mark locations
+if axisRow < w/2 
+    axisCrop = BWhorz(axisRow - axis_margin:axisRow + tic_margin, :);
+    figure, imshow(axisCrop);
+end
+
+
 
 %{
 %Fix vertical

@@ -1,4 +1,10 @@
-function detect_axis(image)
+I = imread('data/Logscale_onedot.jpg');
+figure, imshow(I), title('original image');
+%detect_axis(rgb2gray(I))
+
+image = rgb2gray(I);
+
+
 
 [~, threshold] = edge(image, 'sobel');
 fudgeFactor = .5;
@@ -29,6 +35,7 @@ while axisCol == 1
     startCol = startCol + 1;
 end
 
+%%%%% BEGINNING OF CHANGED %%%%%%%%%%%
 %find x axis (assumption that there is an X axis on bottom of graph)
 startRow = h;
 axisRow = 1;
@@ -50,13 +57,11 @@ yStart = 0;
 xEnd = 0;
 yEnd = 0;
 
-%%%%% BEGINNING OF CHANGED %%%%%%%%%%%
-
 %find y axis start and end
 if axisCol < w * (2/3)
     justYAxis = imopen(BWvert,ones(35, 1));
     yaxisInds = find(BWvert(:,axisCol) == 1);
-    yMax = yaxisInds(1);
+    yEnd = yaxisInds(1);
     %yEnd = yaxisInds(end);
 end
 
@@ -65,7 +70,7 @@ if axisRow > h * (2/3)
     justXAxis = imopen(BWhorz,ones(1, 35));
     xAxisInds = find(BWhorz(axisRow,:) == 1);
     %xStart = xAxisInds(1);
-    xMax = xAxisInds(end);
+    xEnd = xAxisInds(end);
 end
 
 %let starts be at the origin
@@ -75,8 +80,8 @@ end
 originx = axisCol;
 originy = axisRow;
 
-xMin = originx;
-yMin = originy;
+xStart = originx;
+yStart = originy;
 
 disp(originx)
 disp(originy)
@@ -85,66 +90,12 @@ disp(originy)
 figure, imshow(BWvert);
 hold on;
 plot(originx, originy, 'b*');
+hold on;
+plot(xEnd, yEnd, 'b*');
 
-cropped = image(yMax:yMin, xMin:xMax);
+
+cropped = image();
 figure, imshow(cropped);
 title('Cropped Graph');
 %%%%% END OF CHANGED %%%%%%%%%%%
-end
 
-%% find tic marks
-
-%iterate along detected axis and make an array or where ticks are 
-%get rid of threshold
-
-%region labeling to get rid of minor ticks
-
-%{
-tic_margin = 35;
-axis_margin = 0;
-%find y axis start and end
-if axisCol < w/2
-    justYAxis = imclose(BWvert,ones(h-5, 1));
-    imshow(justYAxis)
-    yAxisCrop = justYAxis(:, axisCol - axis_margin:axisCol + tic_margin);
-    yaxisInds = find(yAxisCrop(:,axisCol) == 1);
-end
-
-%find x axis start and end
-if axisRow < h/2 
-    justXAxis = imopen(BWhorz,ones(1, 35));
-    xAxisCrop = justXAxis(axisRow - axis_margin:axisRow + tic_margin, :);
-    xAxisInds = find(xAxisCrop(axisRow,:) == 1);
-    xStart = xAxisInds(1);
-    xEnd = xAxisInds(end);
-    disp(xStart)
-    disp(xEnd)
-end
-%}
-
-%{
-%Fix vertical
-fixedVert = imclose(imopen(rotatedIm,ones(35, 1)), ones(201, 1));
-figure(), imshow(fixedVert);
-title('Vertical Lines');
-
-Im_vert = max(rotatedIm, fixedVert);
-figure(), imshow(Im_vert);
-title('Rotated Form with vert line repair');
-
-%Fix horizontal
-fixedHorz = imclose(imopen(rotatedIm,ones(1, 49)), ones(1, 301));
-figure(), imshow(fixedHorz);
-title('Horizontal Lines');
-
-se90 = strel('line', 3, 90);
-se0 = strel('line', 3, 0);
-
-BWsdil = imdilate(BWs, [se90 se0]);
-figure, imshow(BWsdil), title('dilated gradient mask');
-
-BWoutline = bwperim(BWfinal);
-Segout = I; 
-Segout(BWoutline) = 255; 
-figure, imshow(Segout), title('outlined original image');
-%}
