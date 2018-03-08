@@ -1,101 +1,30 @@
-I = imread('data/Logscale_onedot.jpg');
+clear all; close all;
+imgFile = 'data/Linearscale_onedot.jpg';
+I = imread(imgFile);
 figure, imshow(I), title('original image');
-%detect_axis(rgb2gray(I))
-
 image = rgb2gray(I);
 
+%% User Input
+% ask user for axis type
+ylinear = input('Enter 1 for linear y axis, 0 for log axis: ');
 
+% ask user for axis values
+x1 = input('Enter minimum x value: ');
+x2 = input('Enter maximum x value: ');
+xvalues = [x1 x2];
+y1 = input('Enter minimum y value: ');
+y2 = input('Enter maximum y value: ');
+yvalues = [y1 y2];
 
-[~, threshold] = edge(image, 'sobel');
-fudgeFactor = .5;
-BWhorz = edge(image,'sobel', threshold * fudgeFactor, 'horizontal');
-figure, imshow(BWhorz), title('binary gradient mask horz');
+%% Data Extraction
+[origin,xaxis,yaxis] = detect_axis(image);
 
-fudgeFactor = .5;
-BWvert = edge(image,'sobel', threshold * fudgeFactor, 'vertical');
-figure, imshow(BWvert), title('binary gradient mask vert');
+line = classifyGraph(origin,xaxis,yaxis,imgFile);
 
-
-% coordinates of the origin, endpts of x and y axis
-
-[h, w] = size(BWhorz);
-
-%find y axis (assumption that there is an Y axis on left of graph)
-startCol = 1; 
-axisCol = 1;
-while axisCol == 1
-    currCol = BWvert(:, startCol);
-    condIndsY = find(currCol == 1);
-    numPixelsTrue = size(condIndsY, 1);
-    if numPixelsTrue > h/2
-        disp(numPixelsTrue)
-        axisCol = startCol;
-        break;
-    end 
-    startCol = startCol + 1;
+if line
+    coord = getLineCoord(origin,xaxis,yaxis,xvalues,yvalues,imgFile,ylinear);
+else
+    coord = getMultCoord(origin,xaxis,yaxis,xvalues,yvalues,imgFile,ylinear);
 end
 
-%%%%% BEGINNING OF CHANGED %%%%%%%%%%%
-%find x axis (assumption that there is an X axis on bottom of graph)
-startRow = h;
-axisRow = 1;
-while axisRow == 1
-    currRow = BWhorz(startRow, :);
-    condIndsX = find(currRow);
-    numPixelsTrue = size(condIndsX, 2);
-    if numPixelsTrue > w/2
-        disp(numPixelsTrue)
-        axisRow = startRow;
-        break;
-    end 
-    startRow = startRow - 1;
-end
-
-
-xStart = 0;
-yStart = 0;
-xEnd = 0;
-yEnd = 0;
-
-%find y axis start and end
-if axisCol < w * (2/3)
-    justYAxis = imopen(BWvert,ones(35, 1));
-    yaxisInds = find(BWvert(:,axisCol) == 1);
-    yEnd = yaxisInds(1);
-    %yEnd = yaxisInds(end);
-end
-
-%find x axis start and end
-if axisRow > h * (2/3) 
-    justXAxis = imopen(BWhorz,ones(1, 35));
-    xAxisInds = find(BWhorz(axisRow,:) == 1);
-    %xStart = xAxisInds(1);
-    xEnd = xAxisInds(end);
-end
-
-%let starts be at the origin
-
-
-% determine origin
-originx = axisCol;
-originy = axisRow;
-
-xStart = originx;
-yStart = originy;
-
-disp(originx)
-disp(originy)
-
-
-figure, imshow(BWvert);
-hold on;
-plot(originx, originy, 'b*');
-hold on;
-plot(xEnd, yEnd, 'b*');
-
-
-cropped = image();
-figure, imshow(cropped);
-title('Cropped Graph');
-%%%%% END OF CHANGED %%%%%%%%%%%
-
+%% Data Extraction

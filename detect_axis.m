@@ -1,28 +1,38 @@
-function detect_axis(image)
+function [origin,xaxis,yaxis] = detect_axis(image)
 
 [~, threshold] = edge(image, 'sobel');
 fudgeFactor = .5;
 BWhorz = edge(image,'sobel', threshold * fudgeFactor, 'horizontal');
-figure, imshow(BWhorz), title('binary gradient mask horz');
+%figure, imshow(BWhorz), title('binary gradient mask horz');
 
 fudgeFactor = .5;
 BWvert = edge(image,'sobel', threshold * fudgeFactor, 'vertical');
-figure, imshow(BWvert), title('binary gradient mask vert');
+%figure, imshow(BWvert), title('binary gradient mask vert');
+
+
+[~, threshold] = edge(image, 'sobel');
+fudgeFactor = .5;
+BWhorz = edge(image,'sobel', threshold * fudgeFactor, 'horizontal');
+%figure, imshow(BWhorz), title('binary gradient mask horz');
+
+fudgeFactor = .5;
+BWvert = edge(image,'sobel', threshold * fudgeFactor, 'vertical');
+%figure, imshow(BWvert), title('binary gradient mask vert');
 
 
 % coordinates of the origin, endpts of x and y axis
 
 [h, w] = size(BWhorz);
 
-%find y axis (assumption that there is an Y axis on left of graph)
-startCol = 1; 
+%find y axis
+startCol = 1;
 axisCol = 1;
 while axisCol == 1
     currCol = BWvert(:, startCol);
     condIndsY = find(currCol == 1);
     numPixelsTrue = size(condIndsY, 1);
     if numPixelsTrue > h/2
-        disp(numPixelsTrue)
+        %disp(numPixelsTrue)
         axisCol = startCol;
         break;
     end 
@@ -37,7 +47,7 @@ while axisRow == 1
     condIndsX = find(currRow);
     numPixelsTrue = size(condIndsX, 2);
     if numPixelsTrue > w/2
-        disp(numPixelsTrue)
+        %disp(numPixelsTrue)
         axisRow = startRow;
         break;
     end 
@@ -50,7 +60,6 @@ yStart = 0;
 xEnd = 0;
 yEnd = 0;
 
-%%%%% BEGINNING OF CHANGED %%%%%%%%%%%
 
 %find y axis start and end
 if axisCol < w * (2/3)
@@ -86,11 +95,17 @@ figure, imshow(BWvert);
 hold on;
 plot(originx, originy, 'b*');
 
-cropped = image(yMax:yMin, xMin:xMax);
-figure, imshow(cropped);
-title('Cropped Graph');
-%%%%% END OF CHANGED %%%%%%%%%%%
+%cropped = image(yMax:yMin, xMin:xMax);
+%figure, imshow(cropped);
+%title('Cropped Graph');
+
+origin = [originx,originy];
+
+xaxis = [xMin xMax];
+yaxis = [yMin yMax];
+
 end
+
 
 %% find tic marks
 
