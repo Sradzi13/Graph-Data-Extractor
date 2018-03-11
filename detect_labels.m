@@ -1,98 +1,147 @@
-%{
-function detect_labels(image)
 
+function [xvalues, yvalues] = detect_labels(image, xaxis, yaxis)
+    imgFile = 'data/Template4_linear_number_not_ corner.jpg';
+    I = imread(imgFile);
+    figure, imshow(I);
 
+    gray = rgb2gray(I);
+
+    label_margin = 60;
+
+    % crop out y axis to focus just on x labels
+    xCropped = gray(:, xaxis(1)-(label_margin/2):end);
+    %figure, imshow(cropped);
+
+    % Perform OCR to get axis number labels
+    results = ocr(xCropped, 'CharacterSet', '0123456789', 'TextLayout','Block');
+
+    % Weed out low confidence 
+    confidentIdx = find(results.CharacterConfidences > 0.70);
+    % Get the bounding box locations of the low confidence characters
+    confBBoxes = results.CharacterBoundingBoxes(confidentIdx, :);
+    confVal = results.CharacterConfidences(confidentIdx); % Get confidence values
+
+    % Annotate image with character confidences
+    %im_conf = insertObjectAnnotation(xCropped, 'rectangle', confBBoxes, confVal);
+    %figure, imshow(im_conf);
+
+    labelCrop = mode(confBBoxes(:, 2));
+
+    withoutAxisLabel = xCropped(1:labelCrop + label_margin,:);
+
+    xResults = ocr(withoutAxisLabel, 'TextLayout','Block');
+    xnumBBs = xResults.WordBoundingBoxes;
+    wordConf = xResults.WordConfidences;
+    xNums = xResults.Words;
+
+    Iocr = insertObjectAnnotation(withoutAxisLabel, 'rectangle', xnumBBs, xNums);
+    figure; imshow(Iocr);
+
+    errorThresh = 10;
+    %determine if first detected x axis number label is at xStart 
+    if xnumBBs(1, 1) < errorThresh
+        leftNumOnXstart = true;
+    else
+        leftNumOnXstart = false;
+    end
+
+    %determine if last detected x axis number label is at xEnd
+    xEndNumAlignment = xnumBBs(end, 1) + xaxis(1)-(label_margin/2) + xnumBBs(end, 3)/2;
+    if abs(xEndNumAlignment - xaxis(2)) < errorThresh
+        rightNumOnXend = true;
+    else
+        rightNumOnXend = false;
+    end
+
+    % crop out y axis to focus just on x labels
+    yCropped = gray(1:yaxis(1)+(label_margin/2), :);
+
+    % Perform OCR to get axis number labels
+    results = ocr(yCropped, 'CharacterSet', '0123456789', 'TextLayout','Block');
+
+    % Weed out low confidence 
+    confidentIdx = find(results.CharacterConfidences > 0.70);
+
+    % Get the bounding box locations of the low confidence characters
+    confBBoxes = results.CharacterBoundingBoxes(confidentIdx, :);
+
+    commonY = mode(confBBoxes(:, 1));
+
+    withoutAxisLabel = yCropped(:, commonY - label_margin:end);
+
+    yResults = ocr(withoutAxisLabel, 'TextLayout','Block');
+    ynumBBs = yResults.WordBoundingBoxes;
+    wordConf = yResults.WordConfidences;
+    yNums = yResults.Words;
+
+    %determine if first detected x axis number label is at xStart 
+    yStartNumAlignment = ynumBBs(1, 2) + ynumBBs(1, 4)/2;
+    if (yStartNumAlignment - yaxis(2)) < errorThresh
+        topNumOnYend = true;
+    else
+        topNumOnYend = false;
+    end
+
+    %determine if last detected x axis number label is at xEnd
+    yEndNumAlignment = ynumBBs(end, 2) + ynumBBs(end, 4)/2;
+    if abs(yEndNumAlignment - yaxis(1)) < errorThresh
+        bottomNumOnYstart = true;
+    else
+        bottomNumOnYstart = false;
+    end
+
+    % define min and max of x and y ranges
+    xvalues = [];
+    yvalues = [];
+
+    if leftNumOnXstart
+        xvalues(1) = str2num(xNums{1});
+    else 
+        %find range of labeled values
+        valueDiff = str2num(xNums{end}) - str2num(xNums{1});
+        %find dist those labeled values span over
+        labelDist = abs(xnumBBs(1, 1) - xnumBBs(end, 1));
+        % determine how far the first number is from the beginnning of the x
+        % axis (include width/2 of bounding box)
+        firstNumOffset = abs(xnumBBs(1, 1) + xnumBBs(1, 3)/2 - label_margin/2); 
+        xvalues(1) = str2num(xNums{1}) - (firstNumOffset/labelDist) * valueDiff;
+    end
+
+    if rightNumOnXend
+        xvalues(2) = str2num(xNums{end});
+    else 
+        %find range of labeled values
+        valueDiff = str2num(xNums{end}) - str2num(xNums{1});
+        %find dist those labeled values span over 
+        labelDist = abs(xnumBBs(1, 1) - xnumBBs(end, 1));
+        % determine how far the last number is from the end of the x axis
+        lastNumOffset = abs(xaxis(2) - (xaxis(1)-(label_margin/2)) - xnumBBs(end, 1) + xnumBBs(end, 3)/2); 
+        xvalues(2) = str2num(xNums{end}) + (lastNumOffset/labelDist) * valueDiff;
+    end
+
+    if bottomNumOnYstart
+        yvalues(1) = str2num(yNums{end});
+    else
+        %find range of labeled values
+        valueDiff = abs(str2num(yNums{end}) - str2num(yNums{1}));
+        %find dist those labeled values span over 
+        labelDist = abs(ynumBBs(1, 2) - ynumBBs(end, 2));
+        % determine dist btwn lowest num and end of the y axis near origin
+        lowNumOffset = abs(yaxis(1) - ynumBBs(end, 2) + ynumBBs(end, end)/2); 
+        yvalues(1) = str2num(yNums{end}) - (lowNumOffset/labelDist) * valueDiff; 
+    end
+
+    if topNumOnYend
+        yvalues(2) = str2num(yNums{1});
+    else 
+        %find range of labeled values
+        valueDiff = abs(str2num(yNums{end}) - str2num(yNums{1}));
+        %find dist those labeled values span over 
+        labelDist = abs(ynumBBs(1, 2) - ynumBBs(end, 2));
+        % determine dist btwn lowest num and end of the y axis near origin
+        highNumOffset = abs(yaxis(2) - ynumBBs(1, 2) + ynumBBs(1, end)/2); 
+        yvalues(2) = str2num(yNums{1}) + (highNumOffset/labelDist) * valueDiff;    
+    end
 end
-%}
-
-clear all90; close all;
-imgFile = 'data/Linearscale_onedot.jpg';
-I = imread(imgFile);
-
-level = graythresh(I);
-BW = im2bw(I, level);
-
-% Perform OCR
-%results = ocr(I);
-results = ocr(BW, 'CharacterSet', '0123456789', 'TextLayout','Block');
-
-%{
-figure;
-imshow(I);
-text(600, 150, results.Text, 'BackgroundColor', [1 1 1]);
-%}
-
-disp('hi')
-disp(size(results.CharacterConfidences))
-% Weed out low confidence 
-confidentIdx = find(results.CharacterConfidences > 0);%.75);
-
-disp(size(confidentIdx))
 
 
-% Get the bounding box locations of the low confidence characters
-confBBoxes = results.CharacterBoundingBoxes(confidentIdx, :);
-
-% Get confidence values
-confVal = results.CharacterConfidences(confidentIdx);
-
-% Annotate image with character confidences
-im_conf = insertObjectAnnotation(I, 'rectangle', confBBoxes, confVal);
-
-figure;
-imshow(im_conf);
-
-%narrow results down to those that we are confident in
-disp(size(results.WordBoundingBoxes))
-results.WordBoundingBoxes
-numBBs = results.WordBoundingBoxes;
-wordConf = results.WordConfidences;
-nums = results.Words;
-
-
-im_confWord = insertObjectAnnotation(I, 'rectangle', numBBs, wordConf);
-figure;
-imshow(im_confWord);
-
-figure;
-Iname = insertObjectAnnotation(I, 'rectangle', numBBs, 1:19);
-imshow(Iname);
-title('word');
-%{
-
-% Display one of the recognized words
-disp(size(results.Words))
-for i = 1:size(results.Words, 1)
-    word = results.Words{i};
-    % Location of the word in I
-    wordBBox = results.WordBoundingBoxes(i,:);
-
-    % Show the location of the word in the original image
-    figure;
-    Iname = insertObjectAnnotation(I, 'rectangle', wordBBox, word);
-    imshow(Iname);
-    title(word);
-end
-%}
-
-%{
-%rotate to get rotated y-axis label
-rotI = imrotate(I,270, 'bilinear');
-imshow(rotI);
-results = ocr(rgb2gray(I));
-%}
-
-%{
-If your ocr results are not what you expect, try one or more of the following options:
-
-Increase the image 2-to-4 times the original size.
-
-If the characters in the image are too close together or their edges are touching, use morphology to thin out the characters. Using morphology to thin out the characters separates the characters.
-
-Use binarization to check for non-uniform lighting issues. Use the graythresh and imbinarize functions to binarize the image. If the characters are not visible in the results of the binarization, it indicates a potential non-uniform lighting issue. Try top hat, using the imtophat function, or other techniques that deal with removing non-uniform illumination.
-
-Use the region of interest roi option to isolate the text. Specify the roi manually or use text detection.
-
-If your image looks like a natural scene containing words, like a street scene, rather than a scanned document, try using an ROI input. Also, you can set the TextLayout property to 'Block' or 'Word'.
-
-%}

@@ -22,61 +22,7 @@ yvalues = [y1 y2];
 [origin,xaxis,yaxis] = detect_axis(image);
 
 %% Detecting Labels
-% 
-% imgFile = 'data/Linearscale_onedot.jpg';
-% I = imread(imgFile);
-% figure, imshow(I);
-% 
-% gray = rgb2gray(I);
-% 
-% label_margin = 60;
-% 
-% % crop out y axis to focus just on x labels
-% xCropped = gray(:, xaxis(1)-(label_margin/2):end);
-% %figure, imshow(cropped);
-% 
-% % Perform OCR to get axis number labels
-% results = ocr(xCropped, 'CharacterSet', '0123456789', 'TextLayout','Block');
-% 
-% % Weed out low confidence 
-% confidentIdx = find(results.CharacterConfidences > 0.70);
-% 
-% % Get the bounding box locations of the low confidence characters
-% confBBoxes = results.CharacterBoundingBoxes(confidentIdx, :);
-% 
-% labelCrop = mode(confBBoxes(:, 2));
-% 
-% withoutAxisLabel = xCropped(1:labelCrop + label_margin,:);
-% 
-% xResults = ocr(withoutAxisLabel, 'TextLayout','Block');
-% numBBs = xResults.WordBoundingBoxes;
-% wordConf = xResults.WordConfidences;
-% xNums = xResults.Words;
-% 
-% % crop out y axis to focus just on x labels
-% yCropped = gray(1:yaxis(1)+(label_margin/2), :);
-% 
-% % Perform OCR to get axis number labels
-% results = ocr(yCropped, 'CharacterSet', '0123456789', 'TextLayout','Block');
-% 
-% % Weed out low confidence 
-% confidentIdx = find(results.CharacterConfidences > 0.70);
-% 
-% % Get the bounding box locations of the low confidence characters
-% confBBoxes = results.CharacterBoundingBoxes(confidentIdx, :);
-% 
-% commonY = mode(confBBoxes(:, 1));
-% 
-% withoutAxisLabel = yCropped(:, commonY - label_margin:end);
-% 
-% yResults = ocr(withoutAxisLabel, 'TextLayout','Block');
-% numBBs = yResults.WordBoundingBoxes;
-% wordConf = yResults.WordConfidences;
-% yNums = yResults.Words;
-% 
-% 
-% xvalues = [str2num(xNums{1}) str2num(xNums{end})];
-% yvalues = [str2num(yNums{end}) str2num(yNums{1})];
+[xvalues, yvalues] = detect_labels(image, xaxis, yaxis);
 
 %% Data Extraction
 line = classifyGraph(origin,xaxis,yaxis,imgFile);

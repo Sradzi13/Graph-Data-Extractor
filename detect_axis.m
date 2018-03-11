@@ -9,19 +9,7 @@ fudgeFactor = .5;
 BWvert = edge(image,'sobel', threshold * fudgeFactor, 'vertical');
 %figure, imshow(BWvert), title('binary gradient mask vert');
 
-
-[~, threshold] = edge(image, 'sobel');
-fudgeFactor = .5;
-BWhorz = edge(image,'sobel', threshold * fudgeFactor, 'horizontal');
-%figure, imshow(BWhorz), title('binary gradient mask horz');
-
-fudgeFactor = .5;
-BWvert = edge(image,'sobel', threshold * fudgeFactor, 'vertical');
-%figure, imshow(BWvert), title('binary gradient mask vert');
-
-
 % coordinates of the origin, endpts of x and y axis
-
 [h, w] = size(BWhorz);
 
 %find y axis
@@ -54,31 +42,26 @@ while axisRow == 1
     startRow = startRow - 1;
 end
 
-
 xStart = 0;
 yStart = 0;
 xEnd = 0;
 yEnd = 0;
-
 
 %find y axis start and end
 if axisCol < w * (2/3)
     justYAxis = imopen(BWvert,ones(35, 1));
     yaxisInds = find(BWvert(:,axisCol) == 1);
     yMax = yaxisInds(1);
-    %yEnd = yaxisInds(end);
 end
 
 %find x axis start and end
 if axisRow > h * (2/3) 
     justXAxis = imopen(BWhorz,ones(1, 35));
     xAxisInds = find(BWhorz(axisRow,:) == 1);
-    %xStart = xAxisInds(1);
     xMax = xAxisInds(end);
 end
 
 %let starts be at the origin
-
 
 % determine origin
 originx = axisCol;
@@ -86,10 +69,6 @@ originy = axisRow;
 
 xMin = originx;
 yMin = originy;
-
-disp(originx)
-disp(originy)
-
 
 figure, imshow(BWvert);
 hold on;
