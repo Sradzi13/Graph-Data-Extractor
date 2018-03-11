@@ -12,6 +12,13 @@ function coord = getMultCoord(origin,xaxis,yaxis,xvalues,yvalues,imgFile,ylinear
     img_gray = rgb2gray(img);
     img_bin = ~im2bw(img_gray, graythresh(img_gray));
     img_crop = img_bin(yaxis(2):yaxis(1),xaxis(1):xaxis(2));
+    img_crop_gray = img_gray(yaxis(2):yaxis(1),xaxis(1):xaxis(2));
+    
+    %crop out the edge tick marks (1/30th of img_crop)
+    [h_crop,w_crop] = size(img_crop);
+    img_crop_edge = img_crop_gray(h_crop/30:29*h_crop/30,w_crop/30:29*w_crop/30);
+    figure; imshow(img_crop_edge);
+    [h_crop_edge,w_crop_edge] = size(img_crop_edge);
     
     radius_range = [10 20];
 %     for radii = 2:2:40
@@ -22,11 +29,13 @@ function coord = getMultCoord(origin,xaxis,yaxis,xvalues,yvalues,imgFile,ylinear
 %         end
 %     end
 
-    [centers,radii] = imfindcircles(img_crop,radius_range); % col, row
-    [h_crop,w_crop] = size(img_crop);
+%     [centers_cir,radii] = imfindcircles(img_crop,radius_range); % col, row
+    [centersx,centersy] = diff_overlap_symbol_detection(img_crop_edge);
+    centersy_flip = centersy(end:-1:1);
+    centers = cat(2,centersx',centersy_flip');
     for j = 1:length(centers)-1
-        xdist = centers(j,1);
-        ydist = h_crop - centers(j,2);
+        xdist = centers(j,1) + w_crop/30;
+        ydist = h_crop - (centers(j,2) + h_crop/30);
         xrange = xvalues(2) - xvalues(1);
         coord(j,1) = xrange*(xdist/w_crop) + xvalues(1);
         if ylinear
