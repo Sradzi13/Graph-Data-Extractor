@@ -22,7 +22,7 @@ yvalues = [y1 y2];
 [origin,xaxis,yaxis] = detect_axis(image);
 
 %% Detecting Labels
-[xvalues, yvalues] = detect_labels(image, xaxis, yaxis);
+[xvalues, yvalues] = detect_labels(image, xaxis, yaxis, ylinear);
 
 %% Data Extraction
 line = classifyGraph(origin,xaxis,yaxis,imgFile);

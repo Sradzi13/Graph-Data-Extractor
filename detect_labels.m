@@ -1,7 +1,5 @@
 
-function [xvalues, yvalues] = detect_labels(image, xaxis, yaxis)
-    imgFile = 'data/Template4_linear_number_not_ corner.jpg';
-    I = imread(imgFile);
+function [xvalues, yvalues] = detect_labels(image, xaxis, yaxis, ylinear)
     figure, imshow(I);
 
     gray = rgb2gray(I);
@@ -104,7 +102,9 @@ function [xvalues, yvalues] = detect_labels(image, xaxis, yaxis)
         % determine how far the first number is from the beginnning of the x
         % axis (include width/2 of bounding box)
         firstNumOffset = abs(xnumBBs(1, 1) + xnumBBs(1, 3)/2 - label_margin/2); 
-        xvalues(1) = str2num(xNums{1}) - (firstNumOffset/labelDist) * valueDiff;
+        if ylinear
+            xvalues(1) = str2num(xNums{1}) - (firstNumOffset/labelDist) * valueDiff;
+        end
     end
 
     if rightNumOnXend
@@ -116,7 +116,9 @@ function [xvalues, yvalues] = detect_labels(image, xaxis, yaxis)
         labelDist = abs(xnumBBs(1, 1) - xnumBBs(end, 1));
         % determine how far the last number is from the end of the x axis
         lastNumOffset = abs(xaxis(2) - (xaxis(1)-(label_margin/2)) - xnumBBs(end, 1) + xnumBBs(end, 3)/2); 
-        xvalues(2) = str2num(xNums{end}) + (lastNumOffset/labelDist) * valueDiff;
+        if ylinear
+            xvalues(2) = str2num(xNums{end}) + (lastNumOffset/labelDist) * valueDiff;
+        end
     end
 
     if bottomNumOnYstart
@@ -127,8 +129,10 @@ function [xvalues, yvalues] = detect_labels(image, xaxis, yaxis)
         %find dist those labeled values span over 
         labelDist = abs(ynumBBs(1, 2) - ynumBBs(end, 2));
         % determine dist btwn lowest num and end of the y axis near origin
-        lowNumOffset = abs(yaxis(1) - ynumBBs(end, 2) + ynumBBs(end, end)/2); 
-        yvalues(1) = str2num(yNums{end}) - (lowNumOffset/labelDist) * valueDiff; 
+        lowNumOffset = abs(yaxis(1) - ynumBBs(end, 2) + ynumBBs(end, end)/2);
+        if ylinear 
+            yvalues(1) = str2num(yNums{end}) - (lowNumOffset/labelDist) * valueDiff; 
+        end
     end
 
     if topNumOnYend
@@ -140,7 +144,9 @@ function [xvalues, yvalues] = detect_labels(image, xaxis, yaxis)
         labelDist = abs(ynumBBs(1, 2) - ynumBBs(end, 2));
         % determine dist btwn lowest num and end of the y axis near origin
         highNumOffset = abs(yaxis(2) - ynumBBs(1, 2) + ynumBBs(1, end)/2); 
-        yvalues(2) = str2num(yNums{1}) + (highNumOffset/labelDist) * valueDiff;    
+        if ylinear 
+            yvalues(2) = str2num(yNums{1}) + (highNumOffset/labelDist) * valueDiff;    
+        end
     end
 end
 
