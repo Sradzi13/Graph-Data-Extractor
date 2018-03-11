@@ -16,6 +16,8 @@ function coord = getLineCoord(origin,xaxis,yaxis,xvalues,yvalues,imgFile,linear)
     img_bw = im2bw(img_crop,graythresh(img_crop));
 
     % generate set of x coordinates (at specified resolution)
+    resolution = 81;
+    
 
     % search for zero value in each x coordinate column
 
