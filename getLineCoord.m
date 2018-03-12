@@ -40,7 +40,10 @@ function coord = getLineCoord(origin,xaxis,yaxis,xvalues,yvalues,imgFile,ylinear
         coord(j,1) = xrange*(xdist/w_crop) + xvalues(1);
         if ylinear
             yrange = yvalues(2) - yvalues(1);
-            coord(j,2) = yrange*(ydist/h_crop) + yvalues(1);  
+            coord(j,2) = yrange*(ydist/h_crop) + yvalues(1);
+        else
+            yrange = log10(yvalues(2)) - log10(yvalues(1));
+            coord(j,2) = 10^(log10(yvalues(1)) + yrange*(ydist/h_crop));
         end
     end
     
