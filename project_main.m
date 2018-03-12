@@ -1,6 +1,6 @@
 clear all; close all;
 
-imgFile = 'data/Template20_log_multiple_corner.jpg';
+imgFile = 'data/Template3_log_number_not_ corner.jpg';
 I = imread(imgFile);
 figure, imshow(I), title('original image');
 image = rgb2gray(I);
