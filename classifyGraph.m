@@ -19,13 +19,7 @@ function line = classifyGraph(origin,xaxis,yaxis,imgFile)
     if num_reg > 1
         line = 0;
     else
-        % check if 1 point or a line
-        [row,col] = find(reg_label == 1); %index of region
-        if abs(col(1) - col(end)) < 30 % need to figure out general threshold
-            line = 0;
-        else
-            line = 1; % assuming line won't exist only in width of a marker
-        end
+        line = 1;
     end
 end
 

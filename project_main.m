@@ -1,6 +1,7 @@
 clear all; close all;
 
-imgFile = 'data/Template21.jpg';
+%imgFile = 'data/Template19_linear_multiple_corner.jpg';
+imgFile = 'data/Linearscale_onedot.jpg';
 I = imread(imgFile);
 figure, imshow(I), title('original image');
 image = rgb2gray(I);
@@ -31,7 +32,7 @@ line = classifyGraph(origin,xaxis,yaxis,imgFile);
 if line
     coord = getLineCoord(origin,xaxis,yaxis,xvalues,yvalues,imgFile,ylinear);
     figure; plot(coord(:,1),coord(:,2));
-    axis([xvalues(1) xvalues(2) yvalues(1) yvalues(2)]; 
+    axis([xvalues(1) xvalues(2) yvalues(1) yvalues(2)]); 
 else
     coord = getMultCoord(origin,xaxis,yaxis,xvalues,yvalues,imgFile,ylinear);
 end
