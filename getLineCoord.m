@@ -12,7 +12,13 @@ function coord = getLineCoord(origin,xaxis,yaxis,xvalues,yvalues,imgFile,linear)
     img_gray = rgb2gray(img);
     img_crop = img_gray(yaxis(2):yaxis(1),xaxis(2):xaxis(2));
 
-    % detect number of regions
+    % crop out the edge tick marks (1/30th of img_crop)
+    [h_crop,w_crop] = size(img_crop);
+    img_crop_edge = img_crop_gray(h_crop/30:29*h_crop/30,w_crop/30:29*w_crop/30);
+    figure; imshow(img_crop_edge);
+    [h_crop_edge,w_crop_edge] = size(img_crop_edge);
+    
+    % detect number of regions and choose largest
     img_bw = im2bw(img_crop,graythresh(img_crop));
 
     % generate set of x coordinates (at specified resolution)
