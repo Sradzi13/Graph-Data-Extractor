@@ -16,10 +16,6 @@ function [xvalues, yvalues] = detect_labels(gray, xaxis, yaxis, ylinear)
     confBBoxes = results.CharacterBoundingBoxes(confidentIdx, :);
     confVal = results.CharacterConfidences(confidentIdx); % Get confidence values
 
-    % Annotate image with character confidences
-    %im_conf = insertObjectAnnotation(xCropped, 'rectangle', confBBoxes, confVal);
-    %figure, imshow(im_conf);
-
     commonY = mode(confBBoxes(:, 2));
     commonHeight = mode(confBBoxes(:, 4));
 

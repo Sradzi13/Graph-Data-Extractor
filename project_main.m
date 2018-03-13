@@ -1,11 +1,10 @@
 clear all; close all;
-imgFile = 'data/Template3_log_number_not_ corner.jpg'; %Linearscale_onedot.jpg';y
+imgFile = 'data/Template3_log_number_not_ corner.jpg';
 I = imread(imgFile);
 figure, imshow(I), title('original image');
 image = rgb2gray(I);
 
 %% User Input
-
 % ask user for axis type
 ylinear = input('Enter 1 for linear y axis, 0 for log axis: ');
 
