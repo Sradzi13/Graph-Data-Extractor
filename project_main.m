@@ -1,6 +1,6 @@
 clear all; close all;
 
-imgFile = 'data/Template3_log_number_not_ corner.jpg';
+imgFile = 'data/Template3_log_number_not_ corner.jpg'; %Linearscale_onedot.jpg';y
 I = imread(imgFile);
 figure, imshow(I), title('original image');
 image = rgb2gray(I);
@@ -9,15 +9,6 @@ image = rgb2gray(I);
 
 % ask user for axis type
 ylinear = input('Enter 1 for linear y axis, 0 for log axis: ');
-%{
-% ask user for axis values
-x1 = input('Enter minimum x value: ');
-x2 = input('Enter maximum x value: ');
-xvalues = [x1 x2];
-y1 = input('Enter minimum y value: ');
-y2 = input('Enter maximum y value: ');
-yvalues = [y1 y2];
-%}
 
 %% Detect Axes
 [origin,xaxis,yaxis] = detect_axis(image);
