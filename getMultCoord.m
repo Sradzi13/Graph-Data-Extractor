@@ -17,19 +17,11 @@ function coord = getMultCoord(origin,xaxis,yaxis,xvalues,yvalues,imgFile,ylinear
     %crop out the edge tick marks (1/30th of img_crop)
     [h_crop,w_crop] = size(img_crop);
     img_crop_edge = img_crop_gray(h_crop/30:29*h_crop/30,w_crop/30:29*w_crop/30);
-    figure; imshow(img_crop_edge);
+    %figure; imshow(img_crop_edge);
     [h_crop_edge,w_crop_edge] = size(img_crop_edge);
     
-    radius_range = [10 20];
-%     for radii = 2:2:40
-%         centers = imfindcircles(img_gray,radius); % col, row
-%         if length(centers) > 0
-%             radius = radii
-%             break;
-%         end
-%     end
-
-%     [centers_cir,radii] = imfindcircles(img_crop,radius_range); % col, row
+%    radius_range = [10 20];
+%    [centers_cir,radii] = imfindcircles(img_crop,radius_range); % col, row
     [centersx,centersy] = diff_overlap_symbol_detection(img_crop_edge);
     centersy_flip = centersy(end:-1:1);
     centers = cat(2,centersx',centersy_flip');
