@@ -88,23 +88,18 @@ function [xvalues, yvalues] = detect_labels(gray, xaxis, yaxis, ylinear)
     else
         bottomNumOnYstart = false;
     end
-
-    % define min and max of x and y ranges
-    xvalues = {};
-    yvalues = {};
     
     %if ocr wasn't successful, ask for user's input
     if isempty(str2num(xNums{1})) || isempty(str2num(xNums{end}))
         xmin = input('Enter minimum labeled x value: ');
-        xmax = input('Enter maximum labeled x value: ');
-        xvalues = {}; 
+        xmax = input('Enter maximum labeled x value: '); 
     else
         xmin = str2num(xNums{1});
         xmax = str2num(xNums{end});
     end
 
     if leftNumOnXstart
-        xvalues{1} = xmin;
+        xvalues(1) = xmin;
     else 
         %find range of labeled values
         valueDiff = xmax - xmin;
@@ -113,11 +108,11 @@ function [xvalues, yvalues] = detect_labels(gray, xaxis, yaxis, ylinear)
         % determine how far the first number is from the beginnning of the x
         % axis (include width/2 of bounding box)
         firstNumOffset = abs(xnumBBs(1, 1) + xnumBBs(1, 3)/2 - label_margin/2); 
-        xvalues{1} = xmin - (firstNumOffset/labelDist) * valueDiff;
+        xvalues(1) = xmin - (firstNumOffset/labelDist) * valueDiff;
     end
 
     if rightNumOnXend
-        xvalues{2} = xmax;
+        xvalues(2) = xmax;
     else 
         %find range of labeled values
         valueDiff = xmax - xmin;
@@ -125,22 +120,19 @@ function [xvalues, yvalues] = detect_labels(gray, xaxis, yaxis, ylinear)
         labelDist = abs(xnumBBs(1, 1) - xnumBBs(end, 1));
         % determine how far the last number is from the end of the x axis
         lastNumOffset = abs(xaxis(2) - (xaxis(1)-(label_margin/2)) - xnumBBs(end, 1) + xnumBBs(end, 3)/2); 
-        xvalues{2} = xmax + (lastNumOffset/labelDist) * valueDiff;
-    end
-    xvalues = cell2mat(xvalues);
-    
+        xvalues(2) = xmax + (lastNumOffset/labelDist) * valueDiff;
+    end    
     
     if isempty(str2num(yNums{1})) || isempty(str2num(yNums{end}))
         ymin = input('Enter minimum labeled y value: ');
         ymax = input('Enter maximum labeled y value: ');
-        yvalues = {};
     else
         ymax = str2num(yNums{1}); 
         ymin = str2num(yNums{2});
     end
         
     if bottomNumOnYstart
-        yvalues{1} = ymin;
+        yvalues(1) = ymin;
     else
         %find range of labeled values
         valueDiff = abs(ymax - ymin);
@@ -149,17 +141,17 @@ function [xvalues, yvalues] = detect_labels(gray, xaxis, yaxis, ylinear)
         % determine dist btwn lowest num and end of the y axis near origin
         lowNumOffset = abs(yaxis(1) - ynumBBs(end, 2) + ynumBBs(end, end)/2);
         if ylinear 
-            yvalues{1} = ymin - (lowNumOffset/labelDist) * valueDiff;
+            yvalues(1) = ymin - (lowNumOffset/labelDist) * valueDiff;
         else 
-            f = labelDist;
-            h = labelDist + lowNumOffset;
-            % <-x1-------x2--x3--> x3 = 10^(log(x1) + (f/h)(log(x2) - log(x1)))
-            yvalues{1} = 10^(ymax) + (f/h) * (log(ymin) - log(ymax));    
+            h = labelDist;
+            f = lowNumOffset;
+            % <-ymax-------ymin--ycorner--> 
+            yvalues(1) = 10^(log10(ymin) - (f/h) * (log10(ymax) - log10(ymin)));    
         end
     end
 
     if topNumOnYend
-        yvalues{2} = ymax;
+        yvalues(2) = ymax;
     else 
         %find range of labeled values
         valueDiff = abs(ymax - ymin);
@@ -168,15 +160,13 @@ function [xvalues, yvalues] = detect_labels(gray, xaxis, yaxis, ylinear)
         % determine dist btwn lowest num and end of the y axis near origin
         highNumOffset = abs(yaxis(2) - ynumBBs(1, 2) + ynumBBs(1, end)/2); 
         if ylinear 
-            yvalues{2} = ymax + (highNumOffset/labelDist) * valueDiff;    
+            yvalues(2) = ymax + (highNumOffset/labelDist) * valueDiff;    
         else 
-            f = labelDist;
-            h = labelDist + highNumOffset;
-            % <-x1-------x2--x3--> x3 = 10^(log(x1) + (f/h)(log(x2) - log(x1)))
-            yvalues{2} = 10^(log(ymin)) + (f/h) * (log(ymax) - log(ymin));    
+            h = labelDist;
+            f = highNumOffset;
+            yvalues(2) = 10^(log10(ymax) + (f/h) * (log10(ymax) - log10(ymin)));    
         end
     end
-    yvalues = cell2mat(yvalues);  
 end
 
 
