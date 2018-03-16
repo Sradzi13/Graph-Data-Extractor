@@ -1,5 +1,5 @@
 clear all; close all;
-imgFile = 'data/off_y.jpg';
+imgFile = 'data/wrong_output_y.jpg';
 I = imread(imgFile);
 figure, imshow(I), title('original image');
 image = rgb2gray(I);

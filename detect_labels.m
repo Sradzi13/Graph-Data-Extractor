@@ -124,7 +124,7 @@ function [xvalues, yvalues] = detect_labels(gray, xaxis, yaxis, ylinear)
         ymax = input('Enter maximum labeled y value: ');
     else
         ymax = str2num(yNums{1}); 
-        ymin = str2num(yNums{2});
+        ymin = str2num(yNums{end});
     end
         
     if bottomNumOnYstart
