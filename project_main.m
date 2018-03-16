@@ -1,5 +1,5 @@
 clear all; close all;
-imgFile = 'data/Template3_log_number_not_ corner.jpg';
+imgFile = 'data/off_y.jpg';
 I = imread(imgFile);
 figure, imshow(I), title('original image');
 image = rgb2gray(I);
