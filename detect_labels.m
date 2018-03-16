@@ -4,7 +4,7 @@ function [xvalues, yvalues] = detect_labels(gray, xaxis, yaxis, ylinear)
     label_margin = 60;
 
     % crop out y axis to focus just on x labels
-    xCropped = gray(:, xaxis(1)-(label_margin/2):end);
+    xCropped = gray(yaxis(1):end, xaxis(1)-(label_margin/2):end);
     %figure, imshow(cropped);
 
     % Perform OCR to get axis number labels
@@ -46,7 +46,7 @@ function [xvalues, yvalues] = detect_labels(gray, xaxis, yaxis, ylinear)
     end
 
     % crop out x axis to focus just on y labels
-    yCropped = gray(1:yaxis(1)+(label_margin/2), :);
+    yCropped = gray(1:yaxis(1)+(label_margin/2), 1:xaxis(1));
 
     % Perform OCR to get axis number labels
     results = ocr(yCropped, 'CharacterSet', '-0123456789', 'TextLayout','Block');

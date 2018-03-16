@@ -1,5 +1,6 @@
 clear all; close all;
-imgFile = 'data/Template19_linear_multiple_corner.jpg';
+imgFile = 'data/off_y.jpg';
+
 I = imread(imgFile);
 figure, imshow(I), title('original image');
 image = rgb2gray(I);
