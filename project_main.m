@@ -1,5 +1,5 @@
 clear all; close all;
-imgFile = 'data/Template3_log_number_not_ corner.jpg';
+imgFile = 'data/Template19_linear_multiple_corner.jpg';
 I = imread(imgFile);
 figure, imshow(I), title('original image');
 image = rgb2gray(I);
@@ -12,8 +12,17 @@ ylinear = input('Enter 1 for linear y axis, 0 for log axis: ');
 [origin,xaxis,yaxis] = detect_axis(image);
 
 %% Detecting Labels
-[xvalues, yvalues] = detect_labels(image, xaxis, yaxis, ylinear);
-
+if exist ('ocr')
+    [xvalues, yvalues] = detect_labels(image, xaxis, yaxis, ylinear);
+else
+     x1 = input('Enter minimum x value: ');
+     x2 = input('Enter maximum x value: ');
+     xvalues = [x1 x2];
+     y1 = input('Enter minimum y value: ');
+     y2 = input('Enter maximum y value: ');
+     yvalues = [y1 y2];
+end
+     
 %% Data Extraction
 line = classifyGraph(origin,xaxis,yaxis,imgFile);
 
