@@ -1,7 +1,7 @@
 clear all; close all;
-imgFile = 'data/Template19_linear_multiple_corner.jpg';
-%imgFile = 'Test graphs/scatterplot1.jpg';
-%imgFile = 'Test graphs/IMG_5959.jpg';
+
+imgFile = 'Test graphs/scatterplot1.jpg';
+
 I = imread(imgFile);
 figure, imshow(I), title('original image');
 image = rgb2gray(I);
