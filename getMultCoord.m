@@ -22,7 +22,6 @@ function coord = getMultCoord(origin,xaxis,yaxis,xvalues,yvalues,imgFile,ylinear
     
 
     [centersx,centersy] = diff_overlap_symbol_detection(img_crop_edge);
-    %centersy_flip = centersy(end:-1:1);
     centers = cat(2,centersx',centersy');
     [n_centers,~] = size(centers);
     for j = 1:n_centers
@@ -34,7 +33,7 @@ function coord = getMultCoord(origin,xaxis,yaxis,xvalues,yvalues,imgFile,ylinear
             yrange = yvalues(2) - yvalues(1);
             coord(j,2) = yrange*(ydist/h_crop) + yvalues(1);   
         else
-            yrange = log10(yvalues(2)) - log10(yvalues(1)); %0.1 to 1000-> 3-(-1) = 4
+            yrange = log10(yvalues(2)) - log10(yvalues(1));
             coord(j,2) = 10^(log10(yvalues(1)) + yrange*(ydist/h_crop));
         end
     end

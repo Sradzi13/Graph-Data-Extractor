@@ -19,7 +19,7 @@ function coord = getLineCoord(origin,xaxis,yaxis,xvalues,yvalues,imgFile,ylinear
     [h_crop_edge,w_crop_edge] = size(img_crop_edge);
     
     % detect number of regions and choose smaller
-     img_bw = ~im2bw(img_crop_edge,graythresh(img_crop_edge));
+    img_bw = ~im2bw(img_crop_edge,graythresh(img_crop_edge));
 
     % generate set of x coordinates (at some resolution)
     resolution = 80;

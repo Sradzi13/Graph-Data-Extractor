@@ -1,7 +1,4 @@
-clear all; close all;
-
-imgFile = 'Test graphs/scatterplot1.jpg';
-
+function coord = project_main(imgFile)
 I = imread(imgFile);
 figure, imshow(I), title('original image');
 image = rgb2gray(I);
@@ -45,4 +42,4 @@ else
     figure; semilogy(coord(:,1),coord(:,2),'o');
 end
 axis([xvalues(1) xvalues(2) yvalues(1) yvalues(2)]); title('Extracted data');
-%coord = sort(coord);
+
