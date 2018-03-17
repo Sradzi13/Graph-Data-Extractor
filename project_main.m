@@ -1,10 +1,16 @@
 clear all; close all;
-imgFile = 'data/off_y.jpg';
-
+imgFile = 'data/Template19_linear_multiple_corner.jpg';
+%imgFile = 'Test graphs/scatterplot1.jpg';
+%imgFile = 'Test graphs/IMG_5959.jpg';
 I = imread(imgFile);
 figure, imshow(I), title('original image');
 image = rgb2gray(I);
 
+%% Preprocess
+imgFile = preprocess(imgFile);
+I = imread(imgFile);
+figure, imshow(I), title('original image preprocessed');
+image = rgb2gray(I);
 %% User Input
 % ask user for axis type
 ylinear = input('Enter 1 for linear y axis, 0 for log axis: ');
@@ -25,6 +31,7 @@ else
 end
      
 %% Data Extraction
+
 line = classifyGraph(origin,xaxis,yaxis,imgFile);
 
 if line
@@ -32,10 +39,10 @@ if line
 else
     coord = getMultCoord(origin,xaxis,yaxis,xvalues,yvalues,imgFile,ylinear);
 end
-coord = sort(coord);
 if ylinear
-    figure; plot(coord(:,1),coord(:,2));
+    figure; plot(coord(:,1),coord(:,2),'o');
 else
-    figure; semilogy(coord(:,1),coord(:,2));
+    figure; semilogy(coord(:,1),coord(:,2),'o');
 end
 axis([xvalues(1) xvalues(2) yvalues(1) yvalues(2)]); title('Extracted data');
+%coord = sort(coord);

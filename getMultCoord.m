@@ -20,11 +20,10 @@ function coord = getMultCoord(origin,xaxis,yaxis,xvalues,yvalues,imgFile,ylinear
     %figure; imshow(img_crop_edge);
     [h_crop_edge,w_crop_edge] = size(img_crop_edge);
     
-%    radius_range = [10 20];
-%    [centers_cir,radii] = imfindcircles(img_crop,radius_range); % col, row
+
     [centersx,centersy] = diff_overlap_symbol_detection(img_crop_edge);
-    centersy_flip = centersy(end:-1:1);
-    centers = cat(2,centersx',centersy_flip');
+    %centersy_flip = centersy(end:-1:1);
+    centers = cat(2,centersx',centersy');
     [n_centers,~] = size(centers);
     for j = 1:n_centers
         xdist = centers(j,1) + w_crop/30;
